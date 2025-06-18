@@ -40,6 +40,23 @@
 
     // Add staggered animation to skills
     document.addEventListener('DOMContentLoaded', function() {
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const navMenu = document.getElementById('nav-menu');
+
+        if (hamburgerMenu && navMenu) {
+            hamburgerMenu.addEventListener('click', function() {
+                hamburgerMenu.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+
+            // Close menu when a navigation link is clicked (optional but good UX)
+            navMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function() {
+                    hamburgerMenu.classList.remove('active');
+                    navMenu.classList.remove('active');
+                });
+            });
+        }
       const skillTags = document.querySelectorAll('.skill-tag');
       skillTags.forEach((tag, index) => {
         tag.style.animationDelay = `${index * 0.1}s`;

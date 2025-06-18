@@ -45,17 +45,36 @@
     }
 
     .nav-menu a {
-      color: #8b6f47;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      opacity: 0.8;
+    color: #8b6f47;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+    position: relative; /* Rất quan trọng: để pseudo-element định vị tương đối */
     }
 
+    /* Điều chỉnh nav-menu a:hover để bao gồm gạch dưới */
     .nav-menu a:hover {
-      opacity: 1;
-      color: #a0845c;
-      transform: translateY(-2px);
+        opacity: 1;
+        color: #d2c3c3;
+        transform: translateY(-2px);
+    }
+
+    .nav-menu a::after {
+        content: ''; /* Bắt buộc phải có content để pseudo-element hiển thị */
+        position: absolute;
+        bottom: -5px; /* Vị trí của gạch dưới so với bottom của link */
+        left: 50%; /* Bắt đầu từ giữa */
+        transform: translateX(-50%); /* Dịch chuyển về bên trái 50% chiều rộng của nó để căn giữa */
+        width: 0; /* Chiều rộng ban đầu là 0 */
+        height: 3px; /* Chiều cao của gạch dưới */
+        background-color: #a0845c; /* Màu của gạch dưới */
+        border-radius: 2px; /* Bo tròn góc của gạch */
+        transition: width 0.3s ease-out; /* Hiệu ứng chuyển động khi chiều rộng thay đổi */
+    }
+
+    .nav-menu a:hover::after {
+        width: 25px; /* Chiều rộng của gạch khi hover */
     }
 
     .hero {
@@ -343,32 +362,38 @@
         filter: invert(44%) sepia(30%) saturate(543%) hue-rotate(345deg) brightness(97%) contrast(85%); /* Color icon to match theme */
     }
 
-    @media (max-width: 768px) {
-      .hero {
+
+    /* --- Hamburger Menu Styles --- */
+    .hamburger-menu {
+        display: none; /* Ẩn mặc định trên desktop */
+        cursor: pointer;
         flex-direction: column;
-        text-align: center;
-        padding: 6rem 1rem 2rem;
-      }
-
-      .hero-title {
-        font-size: 2.5rem;
-      }
-
-      .profile-image {
-        width: 250px;
-        height: 250px;
-        margin-top: 2rem;
-      }
-
-      .nav-menu {
-        gap: 1rem;
-      }
-
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
+        justify-content: space-around;
+        width: 30px;
+        height: 25px;
+        position: relative; /* Để các bar nằm trong phạm vi */
+        z-index: 1001; /* Đảm bảo nút hamburger nằm trên menu */
     }
 
+    .hamburger-menu .bar {
+        width: 100%;
+        height: 3px;
+        background-color: #8b6f47; /* Màu của 3 gạch */
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    /* Kích hoạt khi menu mở */
+    .hamburger-menu.active .bar:nth-child(1) {
+        transform: translateY(11px) rotate(45deg);
+    }
+    .hamburger-menu.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger-menu.active .bar:nth-child(3) {
+        transform: translateY(-11px) rotate(-45deg);
+    }
+    
     .floating-elements {
       position: fixed;
       top: 0;
@@ -547,9 +572,204 @@
       box-shadow: 0 20px 40px rgba(139, 111, 71, 0.2);
     }
 
+
+    .project-card {
+    padding: 0; /* Loại bỏ padding mặc định của info-card để hình ảnh tràn viền */
+    overflow: hidden; /* Quan trọng để overlay không tràn ra ngoài bo góc */
+    display: flex; /* Dùng flexbox để căn chỉnh tiêu đề chính */
+    flex-direction: column;
+    justify-content: space-between; /* Đẩy tiêu đề chính xuống dưới */
+}
+
+.project-image-wrapper {
+    position: relative; /* Để overlay định vị tuyệt đối so với wrapper */
+    width: 100%;
+    /* Aspect ratio hack for responsive images (adjust as needed) */
+    padding-bottom: 60%; /* Tỷ lệ 16:9, điều chỉnh nếu hình ảnh của bạn có tỷ lệ khác */
+    overflow: hidden;
+    background-color: #f0f0f0; /* Fallback background */
+}
+
+.project-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Đảm bảo hình ảnh lấp đầy không gian mà không bị biến dạng */
+    transition: transform 0.4s ease-out; /* Hiệu ứng zoom khi hover */
+}
+
+.project-main-title {
+    color: #8b6f47;
+    font-size: 1.3rem;
+    padding: 1rem; /* Padding cho tiêu đề chính */
+    margin-top: auto; /* Đẩy tiêu đề xuống dưới cùng của flex container */
+    margin-bottom: 0;
+    text-align: center;
+}
+
+/* Overlay Styles */
+.project-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(244, 162, 97, 0.9); /* Màu lớp phủ (hơi trong suốt) */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước overlay */
+    opacity: 0; /* Ẩn overlay ban đầu */
+    transform: translateY(100%); /* Ẩn overlay bằng cách trượt xuống dưới */
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out; /* Hiệu ứng chuyển động */
+    text-align: center;
+}
+
+.project-title-overlay {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    color: white; /* Đảm bảo màu trắng */
+}
+
+.project-description-overlay {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.project-details-overlay p {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.project-details-overlay strong {
+    color: white;
+}
+
+.project-link-overlay {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin: 0.5rem 0.5rem 0;
+    transition: background-color 0.3s ease;
+}
+
+.project-link-overlay:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+    transform: none; /* Loại bỏ transform translateY từ cta-button */
+}
+
+/* Hover Effects */
+.project-card:hover .project-overlay {
+    opacity: 1; /* Hiện overlay */
+    transform: translateY(0); /* Trượt overlay lên */
+}
+
+.project-card:hover .project-image {
+    transform: scale(1.05); /* Hiệu ứng zoom nhẹ cho hình ảnh */
+}
+
+/* Ensure info-card default padding is reset for project cards */
+.info-card {
+    padding: 2rem; /* Restore default padding for other info-cards */
+}
+
+.project-card.info-card {
+    padding: 0; /* Specific override for project cards */
+}
+
     /* Footer */
     footer {
         color: white;
         text-align: center;
         padding: 2rem 0;
    }
+
+
+   @media (max-width: 768px) {
+        .hero {
+            flex-direction: column;
+            text-align: center;
+            padding: 6rem 1rem 2rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .profile-image {
+            width: 250px;
+            height: 250px;
+            margin-top: 2rem;
+        }
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        .nav-container {
+            flex-direction: row; /* Trả lại về hàng ngang cho logo và hamburger */
+            justify-content: space-between; /* Căn logo sang trái, hamburger sang phải */
+            align-items: center;
+            gap: 0; /* Loại bỏ gap */
+        }
+
+        .hamburger-menu {
+            display: flex; /* Hiển thị nút hamburger trên mobile */
+        }
+
+        .nav-menu {
+            display: none; /* Ẩn menu mặc định trên mobile */
+            flex-direction: column;
+            width: 100%;
+            position: absolute;
+            top: 100%; /* Đặt menu ngay dưới navbar */
+            left: 0;
+            background: rgba(255, 255, 255, 0.95); /* Nền menu khi mở */
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            z-index: 999; /* Đảm bảo menu nằm dưới hamburger nhưng trên nội dung */
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            transform: translateY(-100%); /* Ẩn menu bằng cách trượt lên trên */
+            opacity: 0;
+        }
+
+        .nav-menu.active {
+            display: flex; /* Hiện menu khi có class 'active' */
+            transform: translateY(0); /* Trượt xuống khi active */
+            opacity: 1;
+        }
+
+        .nav-menu li {
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        .nav-menu a {
+            padding: 0.8rem 1rem;
+            display: block; /* Để toàn bộ khu vực li có thể click */
+        }
+        .nav-menu a::after {
+            /* Điều chỉnh vị trí hoặc kích thước nếu cần trên mobile */
+            bottom: -3px; /* Có thể điều chỉnh vị trí gạch dưới trên mobile */
+            height: 2px; /* Có thể điều chỉnh độ dày gạch dưới trên mobile */
+        }
+        .nav-menu a:hover::after {
+            width: 20px; /* Có thể điều chỉnh chiều rộng gạch dưới trên mobile */
+        }
+        body {
+            padding-top: 60px; /* Điều chỉnh nếu chiều cao navbar thay đổi */
+        }
+    }
